@@ -42,7 +42,7 @@ class ChangeInformationPage extends StatelessWidget {
       bottomNavigationBar: BottomNavigationBarButton(
           buttonName: '수정 완료하기',
           onPressed: () {
-            Get.offAll(() => PersonalPage());
+            Get.off(() => PersonalPage());
           }),
     );
   }

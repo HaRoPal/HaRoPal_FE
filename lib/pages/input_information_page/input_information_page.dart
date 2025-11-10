@@ -42,7 +42,7 @@ class InputInformationPage extends StatelessWidget {
       bottomNavigationBar: BottomNavigationBarButton(
         buttonName: '앱 시작하기',
         onPressed: () {
-          Get.offAll(() => ChatPage());
+          Get.off(() => ChatPage());
         }),
     );
   }

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../pages/chat_page/chat_page.dart';
 import '../../pages/community_page/community_page.dart';
 import '../../pages/personal_page/personal_page.dart';
+import '../../pages/statistics_page/statistics_page.dart';
 import 'components/hamburger_list_tile.dart';
 
 class Hamburger extends StatelessWidget {
@@ -39,7 +40,13 @@ class Hamburger extends StatelessWidget {
                 Get.back();
                 Get.off(() => CommunityPage());
               },),
-            HamburgerListTile(listTileText: '통계', listTileIcon: Icons.pie_chart_outline, onPressed: () {  },),
+            HamburgerListTile(
+              listTileText: '통계',
+              listTileIcon: Icons.pie_chart_outline,
+              onPressed: () {
+                Get.back();
+                Get.off(() => StatisticsPage());
+              },),
           ],
         ),
       ),
