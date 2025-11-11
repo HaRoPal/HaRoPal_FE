@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   get: ^4.7.2
   dio: ^5.9.0
+  flutter_gen_ai_chat_ui: ^2.4.2
 
 dev_dependencies:
   flutter_test:
@@ -65,6 +66,10 @@ flutter:
     - assets/images/exercise/muscle.png
     - assets/images/exercise/sit_up.png
     - assets/images/exercise/push_up.png
+    - assets/images/exercise/dumbell.png
+    - assets/images/exercise/weightlifting.png
+    - assets/images/exercise/running_girl.png
+
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
