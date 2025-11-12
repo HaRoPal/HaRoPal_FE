@@ -4,6 +4,7 @@ import '../../components/appbar/app_bar_with_title_and_hamburger.dart';
 import '../../components/hamburger/hamburger.dart';
 import 'components/personal_information.dart';
 import 'components/routine_count.dart';
+import 'components/streak_calendar.dart';
 
 class PersonalPage extends StatelessWidget {
   const PersonalPage({super.key});
@@ -37,12 +38,7 @@ class PersonalPage extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20.0),
-                child: Container(
-                  color: Colors.grey[500],
-                  width: width,
-                  height: width,
-                  child: Center(child: Text('캘린더 예정')),
-                ),
+                child: StreakCalendar(),
               ),
               RoutineCount(text: '루틴 완료 횟수', count: 20, exp: 000),
               RoutineCount(text: '루틴 연속 완료 횟수', count: 7, exp: 000),
