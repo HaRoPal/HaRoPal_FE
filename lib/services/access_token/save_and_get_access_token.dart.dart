@@ -1,0 +1,1 @@
+Future<void> saveRefreshToken(String? token) async {await secureStorage}
