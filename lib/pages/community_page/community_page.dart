@@ -1,12 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../components/appbar/app_bar_with_title_and_hamburger.dart';
 import '../../components/hamburger/hamburger.dart';
+import '../../controllers/community_controller.dart';
 import 'components/category_container.dart';
 import 'components/exercise_container.dart';
 
-class CommunityPage extends StatelessWidget {
+class CommunityPage extends StatefulWidget {
   const CommunityPage({super.key});
+
+  @override
+  State<CommunityPage> createState() => _CommunityPageState();
+}
+
+class _CommunityPageState extends State<CommunityPage> {
+  final controller = Get.find<CommunityController>();
+
+  @override
+  void initState() {
+    super.initState();
+    controller.fetchSimilar();
+  }
 
   @override
   Widget build(BuildContext context) {
