@@ -27,10 +27,10 @@ class PersonalPage extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                        '00일 연속으로 운동 중이에요!🔥',
+                      '이번 달 00일 만큼 운동하셨어요!🔥',
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20
                       ),
                     ),
                   ],

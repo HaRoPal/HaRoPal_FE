@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../components/appbar/app_bar_with_title_and_hamburger.dart';
 import '../../components/hamburger/hamburger.dart';
-import 'components/big_exercise_container.dart';
+import 'components/exercise_graph.dart';
 import 'components/latest_exercise.dart';
 
 class StatisticsPage extends StatelessWidget {
@@ -28,23 +28,6 @@ class StatisticsPage extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     fontSize: 30,
                   ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 30, 0, 0),
-                child: Text(
-                    "Gymini 추천 활동",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 30.0),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: BigExerciseContainer(),
                 ),
               ),
               Padding(
@@ -95,16 +78,13 @@ class StatisticsPage extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(10, 20, 10, 20),
-                child: Container(
+                padding: const EdgeInsets.all(20.0),
+                child: SizedBox(
                   width: double.infinity,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                  ),
-                  child: Center(child: Text("여기에는 그래프가 들어갑니다")),
+                  height: MediaQuery.of(context).size.width - 20,
+                  child: ExerciseGraph(),
                 ),
-              )
+              ),
             ],
           ),
         ),
