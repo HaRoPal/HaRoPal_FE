@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen_ai_chat_ui/flutter_gen_ai_chat_ui.dart';
-import '../../services/chat/Ai_chat.dart';
+import 'package:get/get.dart';
+import 'package:haropal/pages/chat_page/today_routine_page.dart';
 
+import '../../services/chat/Ai_chat.dart';
 import '../../components/appbar/app_bar_with_hamburger.dart';
 import '../../components/hamburger/hamburger.dart';
+import '../../controllers/routine_controller.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
@@ -14,8 +17,10 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final _controller = ChatMessagesController();
-  final _currentUser = ChatUser(id: 'user', firstName: '사용자 이름');
+  final _currentUser = ChatUser(id: 'user', firstName: '사용자');
   final _aiUser = ChatUser(id: 'ai', firstName: 'Gymini');
+  final routineController = Get.find<RoutineController>();
+
   bool _isLoading = false;
 
   @override
@@ -24,57 +29,99 @@ class _ChatPageState extends State<ChatPage> {
       appBar: AppBarWithHamburger(),
       drawer: Hamburger(),
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
-        child: AiChatWidget(
-          currentUser: _currentUser,
-          aiUser: _aiUser,
-          controller: _controller,
-          onSendMessage: _handleSendMessage,
+      body: Column(
+        children: [
+          // --- 채팅 UI ---
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+              child: AiChatWidget(
+                currentUser: _currentUser,
+                aiUser: _aiUser,
+                controller: _controller,
+                onSendMessage: _handleSendMessage,
 
-          loadingConfig: LoadingConfig(isLoading: _isLoading),
-          inputOptions: InputOptions(
-            sendOnEnter: true,
+                // 로딩
+                loadingConfig: LoadingConfig(isLoading: _isLoading),
+
+                // 입력창
+                inputOptions: InputOptions(
+                  sendOnEnter: true,
+                ),
+
+                // 웰컴 메시지 유지
+                welcomeMessageConfig: WelcomeMessageConfig(
+                  title: 'Gymini에 오신 것을\n환영합니다!',
+                  questionsSectionTitle: '이런 것을 물어보세요:',
+                  containerDecoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey[300]!,
+                        spreadRadius: 2,
+                        blurRadius: 6,
+                      )
+                    ],
+                  ),
+                ),
+
+                exampleQuestions: [
+                  ExampleQuestion(question: "주간 루틴 추천받기"),
+                  ExampleQuestion(question: "어떻게 시작해야 할 지\n모르겠어요"),
+                ],
+
+                // 말풍선 스타일
+                messageOptions: MessageOptions(
+                  bubbleStyle: BubbleStyle(
+                    userBubbleColor: Colors.white,
+                    aiBubbleColor: const Color(0xFFF2F4F5),
+                  ),
+                ),
+              ),
+            ),
           ),
 
-          welcomeMessageConfig: WelcomeMessageConfig(
-            title: 'Gymini에 오신 것을\n환영합니다!',
-            questionsSectionTitle: '이런 것을 물어보세요:',
-            containerDecoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey[300]!,
-                  spreadRadius: 2,
-                  blurRadius: 6,
-                )
-              ]
-            )
-          ),
+          // --- 루틴 있는 경우 버튼 표시 ---
+          Obx(() {
+            final hasRoutine = routineController.routines.isNotEmpty;
+            if (!hasRoutine) return const SizedBox.shrink();
 
-          exampleQuestions: [
-            ExampleQuestion(question: "주간 루틴 추천받기"),
-            ExampleQuestion(question: "어떻게 시작해야 할 지\n모르겠어요"),
-          ],
-
-          messageOptions: MessageOptions(
-            bubbleStyle: BubbleStyle(
-              userBubbleColor: Colors.white,
-              aiBubbleColor: Color(0xFFF2F4F5),
-            )
-          ),
-        ),
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  onPressed: () => Get.to(TodayRoutinePage()),
+                  child: const Text(
+                    "이 루틴으로 운동 시작",
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+              ),
+            );
+          })
+        ],
       ),
     );
   }
 
+  // ====================================================================================
+  // 메시지 전송 처리
+  // ====================================================================================
   Future<void> _handleSendMessage(ChatMessage message) async {
     _controller.addMessage(message);
     setState(() => _isLoading = true);
 
     try {
-      // 최근 3개 유저 메시지만 history
+      // 최근 3개 유저 메시지만 history로
       final userMessages = _controller.messages
           .where((msg) => msg.user.id == "user" && msg.text.trim().isNotEmpty)
           .toList();
@@ -93,60 +140,47 @@ class _ChatPageState extends State<ChatPage> {
       final messageText = response["message"];
       String finalText = "";
 
-      // ----------------------------------------------------------------------------------
-      // CASE 1 — 루틴 생성 (routine: List 형태)
-      // ----------------------------------------------------------------------------------
+      // ================================================================
+      // CASE 1 — 루틴 생성
+      // ================================================================
       if (routineRaw is List) {
+        routineController.saveRoutine(routineRaw);
 
-        routineController
+        // Day 1 루틴만 가져오기
+        final today = routineController.routines.first;
+
+        // 안내 메시지
+        _controller.addMessage(ChatMessage(
+          text: "오늘의 운동 루틴을 요약해드릴게요!",
+          user: _aiUser,
+          createdAt: DateTime.now(),
+        ));
+
+        // 요약 텍스트 구성
         final buffer = StringBuffer();
-        buffer.writeln("🔥 생성된 운동 루틴입니다!\n");
-
-        for (var dayRoutine in routineRaw) {
-          if (dayRoutine is! Map) continue;
-
-          final day = dayRoutine["day"] ?? "Day ?";
-          final focus = dayRoutine["focus"] ?? "";
-          final exercises = dayRoutine["exercises"] ?? [];
-
-          buffer.writeln("📅 $day");
-          buffer.writeln("📌 집중: $focus");
-          buffer.writeln("운동 목록:");
-
-          if (exercises is List) {
-            for (var ex in exercises) {
-              if (ex is! Map) continue;
-
-              buffer.writeln("• ${ex["name"] ?? "이름 없음"}");
-              buffer.writeln("  - 세트: ${ex["sets"] ?? "-"}");
-              buffer.writeln("  - 반복: ${ex["reps"] ?? "-"}");
-              buffer.writeln("  - 휴식: ${ex["rest"] ?? "-"}");
-              buffer.writeln("  - 설명: ${ex["description"] ?? ""}");
-              buffer.writeln("");
-            }
-          }
-
-          buffer.writeln("----------------------------------\n");
+        buffer.writeln("📅 ${today.day}");
+        buffer.writeln("📌 집중: ${today.focus}");
+        buffer.writeln("");
+        buffer.writeln("🔥 오늘 할 운동");
+        for (var ex in today.exercises) {
+          buffer.writeln(
+            "• ${ex.name} — ${ex.sets}세트 / ${ex.reps} (${ex.rest} 휴식)",
+          );
         }
 
-        // notes, kcal 도 붙여주자
-        final notes = response["notes"];
-        final kcal = response["expected_kcal"];
+        _controller.addMessage(ChatMessage(
+          text: buffer.toString(),
+          user: _aiUser,
+          createdAt: DateTime.now(),
+        ));
 
-        if (notes != null) {
-          buffer.writeln("📝 노트:\n$notes\n");
-        }
-
-        if (kcal != null) {
-          buffer.writeln("🔥 예상 소모 칼로리: $kcal kcal");
-        }
-
-        finalText = buffer.toString();
+        // 루틴일 때는 밑의 일반 응답 전송 안 함
+        return;
       }
 
-      // ----------------------------------------------------------------------------------
-      // CASE 2 — 일반 메시지
-      // ----------------------------------------------------------------------------------
+      // ================================================================
+      // CASE 2 — 일반 응답
+      // ================================================================
       else {
         finalText = messageText?.toString() ?? "응답 없음";
       }

@@ -1,3 +1,5 @@
+import 'exercise.dart';
+
 class WorkoutRoutine {
   final String day;
   final String focus;

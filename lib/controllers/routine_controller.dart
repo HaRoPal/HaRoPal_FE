@@ -1,8 +1,10 @@
 import 'package:get/get.dart';
-import '../models/workout_routine.dart';
+
+import '../models/routine/workout_routine.dart';
 
 class RoutineController extends GetxController {
   final routines = <WorkoutRoutine>[].obs;
+  bool get hasRoutine => routines.isNotEmpty;
 
   // today’s routine (Day 1 기준)
   WorkoutRoutine? get todayRoutine {
@@ -14,5 +16,9 @@ class RoutineController extends GetxController {
   void saveRoutine(List<dynamic> jsonList) {
     final parsed = jsonList.map((e) => WorkoutRoutine.fromJson(e)).toList();
     routines.assignAll(parsed);
+  }
+
+  void clearRoutine() {
+    routines.clear();
   }
 }
