@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen_ai_chat_ui/flutter_gen_ai_chat_ui.dart';
+import '../../services/chat/Ai_chat.dart';
 
 import '../../components/appbar/app_bar_with_hamburger.dart';
 import '../../components/hamburger/hamburger.dart';
@@ -73,12 +74,91 @@ class _ChatPageState extends State<ChatPage> {
     setState(() => _isLoading = true);
 
     try {
-      // Your AI service logic here
-      await Future.delayed(Duration(seconds: 1));
+      // 최근 3개 유저 메시지만 history
+      final userMessages = _controller.messages
+          .where((msg) => msg.user.id == "user" && msg.text.trim().isNotEmpty)
+          .toList();
 
-      // Add AI response
+      final history = userMessages
+          .skip(userMessages.length > 3 ? userMessages.length - 3 : 0)
+          .map((msg) => {"role": "user", "content": msg.text})
+          .toList();
+
+      final response = await sendAiMessage(
+        message: message.text,
+        history: history,
+      );
+
+      final routineRaw = response["routine"];
+      final messageText = response["message"];
+      String finalText = "";
+
+      // ----------------------------------------------------------------------------------
+      // CASE 1 — 루틴 생성 (routine: List 형태)
+      // ----------------------------------------------------------------------------------
+      if (routineRaw is List) {
+
+        routineController
+        final buffer = StringBuffer();
+        buffer.writeln("🔥 생성된 운동 루틴입니다!\n");
+
+        for (var dayRoutine in routineRaw) {
+          if (dayRoutine is! Map) continue;
+
+          final day = dayRoutine["day"] ?? "Day ?";
+          final focus = dayRoutine["focus"] ?? "";
+          final exercises = dayRoutine["exercises"] ?? [];
+
+          buffer.writeln("📅 $day");
+          buffer.writeln("📌 집중: $focus");
+          buffer.writeln("운동 목록:");
+
+          if (exercises is List) {
+            for (var ex in exercises) {
+              if (ex is! Map) continue;
+
+              buffer.writeln("• ${ex["name"] ?? "이름 없음"}");
+              buffer.writeln("  - 세트: ${ex["sets"] ?? "-"}");
+              buffer.writeln("  - 반복: ${ex["reps"] ?? "-"}");
+              buffer.writeln("  - 휴식: ${ex["rest"] ?? "-"}");
+              buffer.writeln("  - 설명: ${ex["description"] ?? ""}");
+              buffer.writeln("");
+            }
+          }
+
+          buffer.writeln("----------------------------------\n");
+        }
+
+        // notes, kcal 도 붙여주자
+        final notes = response["notes"];
+        final kcal = response["expected_kcal"];
+
+        if (notes != null) {
+          buffer.writeln("📝 노트:\n$notes\n");
+        }
+
+        if (kcal != null) {
+          buffer.writeln("🔥 예상 소모 칼로리: $kcal kcal");
+        }
+
+        finalText = buffer.toString();
+      }
+
+      // ----------------------------------------------------------------------------------
+      // CASE 2 — 일반 메시지
+      // ----------------------------------------------------------------------------------
+      else {
+        finalText = messageText?.toString() ?? "응답 없음";
+      }
+
       _controller.addMessage(ChatMessage(
-        text: "This is a response to: ${message.text}",
+        text: finalText,
+        user: _aiUser,
+        createdAt: DateTime.now(),
+      ));
+    } catch (e) {
+      _controller.addMessage(ChatMessage(
+        text: "⚠️ 오류 발생: $e",
         user: _aiUser,
         createdAt: DateTime.now(),
       ));
