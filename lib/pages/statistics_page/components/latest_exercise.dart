@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 
 class LatestExercise extends StatelessWidget {
-  const LatestExercise({super.key});
+  final String title;
+  final int workoutTime;
+  final int kcal;
+  final double rating;
+  const LatestExercise({super.key, required this.title, required this.workoutTime, required this.kcal, required this.rating});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(right: 20.0),
       child: Container(
+        constraints: BoxConstraints(
+          minWidth: 280
+        ),
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
             color: Colors.white,
@@ -25,7 +32,7 @@ class LatestExercise extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "유산소 복합",
+                title,
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -43,7 +50,7 @@ class LatestExercise extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(left: 5.0),
                       child: Text(
-                        "10:00 AM - 11:00 AM",
+                        "$workoutTime분",
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w500,
@@ -64,7 +71,7 @@ class LatestExercise extends StatelessWidget {
                       color: Color(0xFF73787B),
                     ),
                     Text(
-                      "250kcal 소모",
+                      "${kcal}kcal 소모",
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
@@ -83,7 +90,7 @@ class LatestExercise extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(top: 5.0),
                     child: Text(
-                      '5.0',
+                      '$rating',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
