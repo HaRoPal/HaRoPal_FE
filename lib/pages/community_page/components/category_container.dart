@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:haropal/controllers/specific_page_controller.dart';
 
+import '../../../controllers/community_controller.dart';
 import '../../specific_statistics_page/specific_statistics_page.dart';
 
 
 class CategoryContainer extends StatelessWidget {
   final String categoryName;
   final String categoryImagePath;
-  const CategoryContainer({super.key, required this.categoryName, required this.categoryImagePath});
+  const CategoryContainer({
+    super.key,
+    required this.categoryName,
+    required this.categoryImagePath
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +21,8 @@ class CategoryContainer extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
       child: GestureDetector(
         onTap: () {
+          final controller = Get.find<SpecificPageController>();
+          controller.fetchSpecificWorkoutFromCategory(categoryName);
           Get.to(() => SpecificStatisticsPage());
         },
         child: Container(

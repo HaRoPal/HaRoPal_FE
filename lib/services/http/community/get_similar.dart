@@ -1,5 +1,4 @@
-
-import '../dio/authorized_dio.dart';
+import '../../dio/authorized_dio.dart';
 
 Future<Map<String, dynamic>> getSimilar() async {
   final dio = await getAuthorizedDio();
