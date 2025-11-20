@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:haropal/components/appbar/app_bar_with_hamburger.dart';
 import 'package:haropal/components/hamburger/hamburger.dart';
 import 'package:haropal/pages/chat_page/chat_page.dart';
+import 'package:haropal/pages/chat_page/routine_summary_page.dart';
 
 import '../../controllers/routine_controller.dart';
 
@@ -91,7 +92,7 @@ class _RoutineFeedbackPageState extends State<RoutineFeedbackPage> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      "00:57:34",
+                      "00:57:34", //TODO: 백엔드 응답값으로 교체
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -171,8 +172,7 @@ class _RoutineFeedbackPageState extends State<RoutineFeedbackPage> {
           child: ElevatedButton(
             onPressed: () {
               // 별점 값들은 _exerciseRatings, _routineSatisfaction 에 들어 있음
-              routineController.clearRoutine();
-              Get.off(ChatPage());
+              Get.to(RoutineSummaryPage());
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF2A66FF),

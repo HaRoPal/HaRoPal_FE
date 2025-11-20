@@ -5,8 +5,9 @@ import 'package:haropal/components/hamburger/hamburger.dart';
 import 'package:haropal/pages/chat_page/routine_feedback_page.dart';
 
 import '../../controllers/routine_controller.dart';
+import 'chat_page.dart';
 
-class TodayRoutinePage extends StatelessWidget {
+class RoutineSummaryPage extends StatelessWidget {
   final routineController = Get.find<RoutineController>();
 
   @override
@@ -39,80 +40,87 @@ class TodayRoutinePage extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.all(20),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+
               children: [
                 /// 상단 제목
                 Text(
                   "오늘의 운동 루틴",
                   style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF006BE5)
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF006BE5)
                   ),
                 ),
                 SizedBox(height: 12),
 
-                /// 집중 분야
+                /// 소모된 칼로리
                 Text(
-                  "집중 분야: ${today.focus}",
+                  "소모된 칼로리",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
+                Text(
+                  "422kcal",
+                  style: TextStyle(
+                    fontSize: 38,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF006BE5)
+                  ),
+                ),
 
-                SizedBox(height: 20),
+
+                SizedBox(height: 28),
+
+                /// 운동 시간
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "운동 시간",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      "•",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      "00:57:34", //TODO: 백엔드 응답값으로 교체
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 12),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: today.exercises
+                      .map((ex) => Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                    child: _infoTag(ex.name),
+                  ))
+                      .toList(),
+                ),
+
+                SizedBox(height: 6),
+
                 Divider(),
 
-                /// 운동 리스트
-                ...today.exercises.map((ex) {
-                  return Container(
-                    margin: EdgeInsets.only(bottom: 16),
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Color(0xFFFAFAFA),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        /// 운동 이름
-                        Text(
-                          ex.name,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
 
-                        SizedBox(height: 8),
-
-                        /// 세트/반복/휴식 태그
-                        Row(
-                          children: [
-                            _infoTag("세트", "${ex.sets}"),
-                            SizedBox(width: 8),
-                            _infoTag("반복", ex.reps),
-                            SizedBox(width: 8),
-                            _infoTag("휴식", ex.rest),
-                          ],
-                        ),
-
-                        SizedBox(height: 12),
-
-                        /// 설명
-                        Text(
-                          ex.description,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
               ],
             ),
           ),
@@ -130,7 +138,8 @@ class TodayRoutinePage extends StatelessWidget {
           width: double.infinity,
           child: ElevatedButton(
             onPressed: () {
-              Get.to(RoutineFeedbackPage());
+              routineController.clearRoutine();
+              Get.off(ChatPage());
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Color(0xFF2A66FF),
@@ -139,7 +148,7 @@ class TodayRoutinePage extends StatelessWidget {
               ),
             ),
             child: Text(
-              "운동 종료",
+              "확인",
               style: TextStyle(
                 fontSize: 18,
                 color: Colors.white,
@@ -155,7 +164,7 @@ class TodayRoutinePage extends StatelessWidget {
   /// -------------------------
   /// 세트/반복/휴식 태그 UI 재사용 코드
   /// -------------------------
-  Widget _infoTag(String label, String value) {
+  Widget _infoTag(String label) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 4, horizontal: 10),
       decoration: BoxDecoration(
@@ -163,7 +172,7 @@ class TodayRoutinePage extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        "$label: $value",
+        "$label",
         style: TextStyle(
           color: Colors.blue.shade800,
           fontWeight: FontWeight.w600,

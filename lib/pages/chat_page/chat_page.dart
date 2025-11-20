@@ -19,9 +19,9 @@ class _ChatPageState extends State<ChatPage> {
   final _controller = ChatMessagesController();
   final _currentUser = ChatUser(id: 'user', firstName: '사용자');
   final _aiUser = ChatUser(id: 'ai', firstName: 'Gymini');
-  final routineController = Get.find<RoutineController>();
 
-  bool _isLoading = false;
+  final routineController = Get.find<RoutineController>();
+  final isLoading = false.obs; // loading GetX 로 관리
 
   @override
   Widget build(BuildContext context) {
@@ -31,61 +31,75 @@ class _ChatPageState extends State<ChatPage> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // --- 채팅 UI ---
+          // -----------------------------
+          // Chat UI
+          // -----------------------------
           Expanded(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-              child: AiChatWidget(
-                currentUser: _currentUser,
-                aiUser: _aiUser,
-                controller: _controller,
-                onSendMessage: _handleSendMessage,
+              child: Obx(() {
+                return AiChatWidget(
+                  currentUser: _currentUser,
+                  aiUser: _aiUser,
+                  controller: _controller,
+                  onSendMessage: _handleSendMessage,
 
-                // 로딩
-                loadingConfig: LoadingConfig(isLoading: _isLoading),
-
-                // 입력창
-                inputOptions: InputOptions(
-                  sendOnEnter: true,
-                ),
-
-                // 웰컴 메시지 유지
-                welcomeMessageConfig: WelcomeMessageConfig(
-                  title: 'Gymini에 오신 것을\n환영합니다!',
-                  questionsSectionTitle: '이런 것을 물어보세요:',
-                  containerDecoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey[300]!,
-                        spreadRadius: 2,
-                        blurRadius: 6,
-                      )
-                    ],
+                  loadingConfig: LoadingConfig(
+                    isLoading: isLoading.value,
                   ),
-                ),
 
-                exampleQuestions: [
-                  ExampleQuestion(question: "주간 루틴 추천받기"),
-                  ExampleQuestion(question: "어떻게 시작해야 할 지\n모르겠어요"),
-                ],
+                  // Streaming 비활성화 → AI 애니메이션 재실행 문제 해결
+                  enableMarkdownStreaming: false,
+                  enableAnimation: false,
 
-                // 말풍선 스타일
-                messageOptions: MessageOptions(
-                  bubbleStyle: BubbleStyle(
-                    userBubbleColor: Colors.white,
-                    aiBubbleColor: const Color(0xFFF2F4F5),
+                  inputOptions: InputOptions.minimal(
+                    hintText: '무엇이든 물어보세요...',
+                    textColor: Colors.black,
+                    hintColor: Colors.grey,
+                    backgroundColor: Color(0xFFF0F0F0),
+                    borderRadius: 24.0,
+                    autofocus: true,        // Available in factory constructors too
                   ),
-                ),
-              ),
+
+                  welcomeMessageConfig: WelcomeMessageConfig(
+                    title: 'Gymini에 오신 것을\n환영합니다!',
+                    questionsSectionTitle: '이런 것을 물어보세요:',
+                    containerDecoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey[300]!,
+                          spreadRadius: 2,
+                          blurRadius: 6,
+                        )
+                      ],
+                    ),
+                  ),
+
+                  exampleQuestions: [
+                    ExampleQuestion(question: "주간 루틴 추천받기"),
+                    ExampleQuestion(question: "어떻게 시작해야 할 지\n모르겠어요"),
+                  ],
+
+                  messageOptions: MessageOptions(
+                    bubbleStyle: BubbleStyle(
+                      userBubbleColor: Colors.white,
+                      aiBubbleColor: const Color(0xFFF2F4F5),
+                    ),
+                  ),
+                );
+              }),
             ),
           ),
 
-          // --- 루틴 있는 경우 버튼 표시 ---
+          // -----------------------------
+          // 루틴 버튼
+          // -----------------------------
           Obx(() {
-            final hasRoutine = routineController.routines.isNotEmpty;
-            if (!hasRoutine) return const SizedBox.shrink();
+            if (routineController.routines.isEmpty) {
+              return const SizedBox(height: 10);
+            }
 
             return Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
@@ -113,24 +127,26 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  // ====================================================================================
+  // ================================================================
   // 메시지 전송 처리
-  // ====================================================================================
+  // ================================================================
   Future<void> _handleSendMessage(ChatMessage message) async {
     _controller.addMessage(message);
-    setState(() => _isLoading = true);
+
+    isLoading.value = true;
 
     try {
-      // 최근 3개 유저 메시지만 history로
+      // 최근 3개 유저 메시지
       final userMessages = _controller.messages
           .where((msg) => msg.user.id == "user" && msg.text.trim().isNotEmpty)
           .toList();
 
       final history = userMessages
-          .skip(userMessages.length > 3 ? userMessages.length - 3 : 0)
+          .skip(userMessages.length > 5 ? userMessages.length - 5 : 0)
           .map((msg) => {"role": "user", "content": msg.text})
           .toList();
 
+      // API
       final response = await sendAiMessage(
         message: message.text,
         history: history,
@@ -138,66 +154,52 @@ class _ChatPageState extends State<ChatPage> {
 
       final routineRaw = response["routine"];
       final messageText = response["message"];
-      String finalText = "";
 
-      // ================================================================
+      // -------------------------------
       // CASE 1 — 루틴 생성
-      // ================================================================
+      // -------------------------------
       if (routineRaw is List) {
         routineController.saveRoutine(routineRaw);
-
-        // Day 1 루틴만 가져오기
         final today = routineController.routines.first;
 
-        // 안내 메시지
-        _controller.addMessage(ChatMessage(
-          text: "오늘의 운동 루틴을 요약해드릴게요!",
-          user: _aiUser,
-          createdAt: DateTime.now(),
-        ));
+        _addStaticAiMessage("오늘의 운동 루틴을 요약해드릴게요!");
 
-        // 요약 텍스트 구성
         final buffer = StringBuffer();
         buffer.writeln("📅 ${today.day}");
         buffer.writeln("📌 집중: ${today.focus}");
         buffer.writeln("");
         buffer.writeln("🔥 오늘 할 운동");
         for (var ex in today.exercises) {
-          buffer.writeln(
-            "• ${ex.name} — ${ex.sets}세트 / ${ex.reps} (${ex.rest} 휴식)",
-          );
+          buffer.writeln("• ${ex.name} — ${ex.sets}세트 / ${ex.reps} (${ex.rest} 휴식)");
         }
 
-        _controller.addMessage(ChatMessage(
-          text: buffer.toString(),
-          user: _aiUser,
-          createdAt: DateTime.now(),
-        ));
-
-        // 루틴일 때는 밑의 일반 응답 전송 안 함
+        _addStaticAiMessage(buffer.toString());
         return;
       }
 
-      // ================================================================
-      // CASE 2 — 일반 응답
-      // ================================================================
-      else {
-        finalText = messageText?.toString() ?? "응답 없음";
-      }
-
-      _controller.addMessage(ChatMessage(
-        text: finalText,
-        user: _aiUser,
-        createdAt: DateTime.now(),
-      ));
+      // -------------------------------
+      // CASE 2 — 일반 답변
+      // -------------------------------
+      final text = messageText?.toString() ?? "응답 없음";
+      _addStaticAiMessage(text);
     } catch (e) {
-      _controller.addMessage(ChatMessage(
-        text: "⚠️ 오류 발생: $e",
+      _addStaticAiMessage("⚠️ 오류 발생: $e");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // ================================================================
+  // AI 메시지를 "static"으로 추가하는 함수
+  // ================================================================
+  void _addStaticAiMessage(String text) {
+    _controller.addMessage(
+      ChatMessage(
+        text: text,
         user: _aiUser,
         createdAt: DateTime.now(),
-      ));
-    } finally {
-      setState(() => _isLoading = false);
-    }
+        isMarkdown: true,
+      ),
+    );
   }
 }
