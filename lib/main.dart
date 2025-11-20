@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'init_controllers.dart';
-import 'pages/input_information_page/input_information_page.dart';
+ㅈimport 'pages/login_page/start_page.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const InputInformationPage(),
+      home: const LoginPage(),
     );
   }
 }

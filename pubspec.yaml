@@ -75,6 +75,14 @@ flutter:
     - assets/images/exercise/dumbell.png
     - assets/images/exercise/weightlifting.png
     - assets/images/exercise/running_girl.png
+    - assets/images/exercise/가슴.png
+    - assets/images/exercise/다리.png
+    - assets/images/exercise/등.png
+    - assets/images/exercise/어깨.png
+    - assets/images/exercise/유산소.png
+    - assets/images/exercise/복근.png
+    - assets/images/exercise/팔.png
+    - assets/images/icon/gymini_icon.png
 
     - .env
 

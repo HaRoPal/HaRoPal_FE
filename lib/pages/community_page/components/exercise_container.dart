@@ -1,10 +1,28 @@
 import 'package:flutter/material.dart';
 
+import '../../../helper/filter_category_image.dart';
+
 class ExerciseContainer extends StatelessWidget {
-  const ExerciseContainer({super.key});
+  final String nickname;
+  final String category;
+  final int kcal;
+  final int satisfaction;
+  final double height;
+  final double weight;
+  final String totalTime;
+  const ExerciseContainer({super.key,
+    required this.kcal,
+    required this.nickname,
+    required this.category,
+    required this.satisfaction,
+    required this.height,
+    required this.weight,
+    required this.totalTime
+  });
 
   @override
   Widget build(BuildContext context) {
+    final imagePath = filterCategoryImage[category];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: Container(
@@ -31,25 +49,20 @@ class ExerciseContainer extends StatelessWidget {
                   children: [
                     Column(
                       children: [
-                        Row(
-                          children: [
-                            CircleAvatar(),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 5.0),
-                              child: Text(
-                                  "User1",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Color(0xFF72777A),
-                                ),
-                              ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 7.5),
+                          child: Text(
+                              nickname,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Color(0xFF72777A),
                             ),
-                          ],
+                          ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 5.0),
-                          child: Text('173cm · 72kg'),
+                          padding: const EdgeInsets.only(top: 10.0),
+                          child: Text('${height}cm · ${weight}kg'),
                         )
                       ],
                     ),
@@ -64,7 +77,7 @@ class ExerciseContainer extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(top: 5.0),
                           child: Text(
-                              '217kcal',
+                              '${kcal}kcal',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
@@ -81,28 +94,13 @@ class ExerciseContainer extends StatelessWidget {
                   children: [
                     Column(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10.0),
-                          child: Row(
-                            children: [
-                              Image.asset(
-                                'assets/images/exercise/muscle.png',
-                                width: 25,
-                              ),
-                              Image.asset(
-                                'assets/images/exercise/push_up.png',
-                                width: 25,
-                              ),
-                              Image.asset(
-                                'assets/images/exercise/sit_up.png',
-                                width: 25,
-                              ),
-                            ],
-                          ),
+                        Image.asset(
+                          imagePath!,
+                          width: 30,
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 10.0),
-                          child: Text("시간 · 00:42:34"),
+                          child: Text("시간 · $totalTime"),
                         )
                       ],
                     ),
@@ -118,11 +116,22 @@ class ExerciseContainer extends StatelessWidget {
                           padding: const EdgeInsets.fromLTRB(0, 10, 0, 6),
                           child: Row(
                             children: [
-                              Icon(Icons.star, color: Colors.amber, size: 17.5,),
-                              Icon(Icons.star, color: Colors.amber, size: 17.5,),
-                              Icon(Icons.star, color: Colors.amber, size: 17.5,),
-                              Icon(Icons.star_border, size: 17.5,),
-                              Icon(Icons.star_border, size: 17.5,),
+                              Row(
+                                children: List.generate(
+                                  satisfaction,
+                                    (index) {
+                                      return Icon(Icons.star, color: Colors.amber, size: 17.5,);
+                                    }
+                                )
+                              ),
+                              Row(
+                                  children: List.generate(
+                                      5 - satisfaction,
+                                          (index) {
+                                        return Icon(Icons.star_border, size: 17.5,);
+                                      }
+                                  )
+                              ),
                             ],
                           ),
                         )
