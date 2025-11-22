@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'init_controllers.dart';
-ㅈimport 'pages/login_page/start_page.dart';
+import 'pages/login_page/start_page.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
