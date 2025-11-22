@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:haropal/pages/login_page/sign_in_page.dart';
+import 'package:haropal/pages/login_page/sign_up_page.dart';
 
 import '../input_information_page/input_information_page.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class StartPage extends StatelessWidget {
+  const StartPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +34,7 @@ class LoginPage extends StatelessWidget {
               ),
             ),
             Text(
-                'AI 와 함께하는 운동 메이트',
+                'AI와 함께하는 운동 메이트',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 30,
@@ -46,7 +48,9 @@ class LoginPage extends StatelessWidget {
                     foregroundColor: Colors.white,
                     backgroundColor: Color(0xFF0070F0)
                   ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Get.to(SignUpPage());
+                    },
                     child: Text(
                         "회원 가입",
                       style: TextStyle(
@@ -63,7 +67,7 @@ class LoginPage extends StatelessWidget {
                           backgroundColor: Color(0xFF0070F0)
                       ),
                       onPressed: () {
-                        Get.offAll(() => InputInformationPage());
+                        Get.to(SignInPage());
                       },
                       child: Text(
                           "로그인",
