@@ -37,7 +37,7 @@ dependencies:
 
   get: ^4.7.2
   dio: ^5.9.0
-  flutter_secure_storage: ^9.0.0
+  flutter_secure_storage: ^9.2.4
   flutter_dotenv: ^5.1.0
 
   flutter_gen_ai_chat_ui: ^2.4.2
@@ -80,8 +80,8 @@ flutter:
     - assets/images/exercise/등.png
     - assets/images/exercise/어깨.png
     - assets/images/exercise/유산소.png
-    - assets/images/exercise/복근.png
     - assets/images/exercise/팔.png
+    - assets/images/exercise/복근.png
     - assets/images/icon/gymini_icon.png
 
     - .env

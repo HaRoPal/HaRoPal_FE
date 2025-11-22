@@ -89,12 +89,12 @@ class TodayRoutinePage extends StatelessWidget {
                         SizedBox(height: 8),
 
                         /// 세트/반복/휴식 태그
-                        Row(
+                        Wrap(
+                          spacing: 8,        // 요소 간 가로 간격
+                          runSpacing: 6,     // 줄바뀔 때 세로 간격
                           children: [
                             _infoTag("세트", "${ex.sets}"),
-                            SizedBox(width: 8),
                             _infoTag("반복", ex.reps),
-                            SizedBox(width: 8),
                             _infoTag("휴식", ex.rest),
                           ],
                         ),

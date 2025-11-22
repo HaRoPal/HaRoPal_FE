@@ -1,4 +1,6 @@
-import '../dio/authorized_dio.dart';
+
+
+import '../../dio/authorized_dio.dart';
 
 Future<Map<String, dynamic>> sendAiMessage({
   required String message,
