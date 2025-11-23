@@ -95,7 +95,7 @@ class ExerciseContainer extends StatelessWidget {
                     Column(
                       children: [
                         Image.asset(
-                          imagePath!,
+                          imagePath ?? 'assets/images/exercise/가슴.png',
                           width: 30,
                         ),
                         Padding(
