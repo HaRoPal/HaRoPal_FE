@@ -3,10 +3,10 @@ import 'package:flutter_gen_ai_chat_ui/flutter_gen_ai_chat_ui.dart';
 import 'package:get/get.dart';
 import 'package:haropal/pages/chat_page/today_routine_page.dart';
 
-import '../../services/chat/Ai_chat.dart';
 import '../../components/appbar/app_bar_with_hamburger.dart';
 import '../../components/hamburger/hamburger.dart';
 import '../../controllers/routine_controller.dart';
+import '../../services/http/chat/Ai_chat.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
