@@ -40,13 +40,25 @@ class _SignInPageState extends State<SignInPage> {
         child: Column(
           children: [
             TextField(
-              decoration: const InputDecoration(labelText: "이메일"),
+              decoration: const InputDecoration(
+                labelText: "이메일",
+                labelStyle: TextStyle(color: Color(0xFF0070F0)),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xFF0070F0)),
+                ),
+              ),
               onChanged: (v) => setState(() => email = v),
             ),
             const SizedBox(height: 16),
 
             TextField(
-              decoration: const InputDecoration(labelText: "비밀번호"),
+              decoration: const InputDecoration(
+                labelText: "비밀번호",
+                labelStyle: TextStyle(color: Color(0xFF0070F0)),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xFF0070F0)),
+                ),
+              ),
               obscureText: true,
               onChanged: (v) => setState(() => password = v),
             ),
@@ -56,16 +68,20 @@ class _SignInPageState extends State<SignInPage> {
               width: double.infinity,
               height: 48,
               child: ElevatedButton(
-                onPressed: isFormValid ? () async {
-                  final result = await signIn(email: email, password: password);
-                  if(result["success"] == true) {
-                    Get.snackbar('로그인 성공', '로그인에 성공하였습니다');
-                    Get.offAll(() => InputInformationPage());
-                  }
-                  else{
-                    Get.snackbar('오류', '로그인에 실패하였습니다');
-                  }
-                } : null,
+                onPressed: isFormValid
+                    ? () async {
+                        final result = await signIn(
+                          email: email,
+                          password: password,
+                        );
+                        if (result["success"] == true) {
+                          Get.snackbar('로그인 성공', '로그인에 성공하였습니다');
+                          Get.offAll(() => InputInformationPage());
+                        } else {
+                          Get.snackbar('오류', '로그인에 실패하였습니다');
+                        }
+                      }
+                    : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryBlue,
                   disabledBackgroundColor: Colors.grey.shade300,

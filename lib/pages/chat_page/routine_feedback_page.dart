@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:haropal/components/appbar/app_bar_with_hamburger.dart';
-import 'package:haropal/components/hamburger/hamburger.dart';
-import 'package:haropal/pages/chat_page/chat_page.dart';
 import 'package:haropal/pages/chat_page/routine_summary_page.dart';
-
+import '../../components/appbar/app_bar_with_hamburger.dart';
+import '../../components/hamburger/hamburger.dart';
 import '../../controllers/routine_controller.dart';
+import '../../controllers/today_routine_controller.dart';
+import '../../services/http/routine/submit_routine_rating.dart';
+import 'chat_page.dart';
 
 class RoutineFeedbackPage extends StatefulWidget {
+  final int dayNumber;
 
-  const RoutineFeedbackPage({
-    Key? key,
-  }) : super(key: key);
+  const RoutineFeedbackPage({super.key, required this.dayNumber});
 
   @override
   State<RoutineFeedbackPage> createState() => _RoutineFeedbackPageState();
@@ -19,29 +19,30 @@ class RoutineFeedbackPage extends StatefulWidget {
 
 class _RoutineFeedbackPageState extends State<RoutineFeedbackPage> {
   final routineController = Get.find<RoutineController>();
+  final todayController = Get.find<TodayRoutineController>();
 
-  late List<int> _exerciseRatings; // 각 운동별 별점 (0~5)
-  int _routineSatisfaction = 0;    // 루틴 전체 만족도 (0~5)
+  late List<int> ratings;
+  int _routineSatisfaction = 0;
 
   @override
   void initState() {
     super.initState();
-    final today = routineController.todayRoutine;
-    // today가 null인 경우를 대비해서 길이 0으로
-    final length = today?.exercises.length ?? 0;
-    _exerciseRatings = List<int>.filled(length, 0);
+
+    final todayExercises =
+        routineController.routines[widget.dayNumber - 1].exercises;
+
+    ratings = List.generate(todayExercises.length, (_) => 0);
   }
 
   @override
   Widget build(BuildContext context) {
-    final today = routineController.todayRoutine;
+    final finishRes = todayController.finalResponse.value;
 
-    if (today == null) {
-      return Scaffold(
-        appBar: AppBarWithHamburger(),
-        body: const Center(child: Text("평가할 루틴이 없습니다.")),
-      );
-    }
+    final totalSeconds = finishRes?["totalTime"] ?? 0;
+    final timeFormatted = formatSeconds(totalSeconds);
+
+    final todayExercises =
+        routineController.routines[widget.dayNumber - 1].exercises;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
@@ -62,15 +63,15 @@ class _RoutineFeedbackPageState extends State<RoutineFeedbackPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 /// 상단 제목
-                const Text(
+                Text(
                   "운동 난이도 평가",
-                  style: TextStyle(
-                    fontSize: 20,
+                  style: const TextStyle(
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF006BE5),
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
 
                 /// 운동 시간
                 Row(
@@ -83,16 +84,11 @@ class _RoutineFeedbackPageState extends State<RoutineFeedbackPage> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Text(
-                      "•",
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
-                      ),
-                    ),
+                    const Text("•", style: TextStyle(color: Colors.grey)),
                     const SizedBox(width: 8),
+
                     Text(
-                      "00:57:34", //TODO: 백엔드 응답값으로 교체
+                      timeFormatted,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -101,32 +97,52 @@ class _RoutineFeedbackPageState extends State<RoutineFeedbackPage> {
                   ],
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 28),
 
-                /// ----- 각 운동별 난이도 별점 -----
+                /// 운동별 난이도
                 ListView.builder(
-                  itemCount: today.exercises.length,
+                  itemCount: todayExercises.length,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (context, index) {
-                    final ex = today.exercises[index];
+                    final ex = todayExercises[index];
 
                     return Padding(
                       padding: EdgeInsets.only(
-                        bottom: index == today.exercises.length - 1 ? 24 : 16,
+                        bottom: index == todayExercises.length - 1 ? 32 : 24,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _exerciseChip(ex.name),
+                          Text(
+                            ex.name,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                           const SizedBox(height: 12),
-                          _StarRating(
-                            rating: _exerciseRatings[index],
-                            onChanged: (value) {
-                              setState(() {
-                                _exerciseRatings[index] = value;
-                              });
-                            },
+
+                          /// Dropdown → 별점 UI로 교체했지만 데이터 로직 동일
+                          Row(
+                            children: List.generate(5, (i) {
+                              final filled = i < ratings[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    ratings[index] = i + 1;
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 12),
+                                  child: Icon(
+                                    filled ? Icons.star : Icons.star_border,
+                                    size: 32,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              );
+                            }),
                           ),
                         ],
                       ),
@@ -134,27 +150,40 @@ class _RoutineFeedbackPageState extends State<RoutineFeedbackPage> {
                   },
                 ),
 
-                const SizedBox(height: 8),
-                const Divider(thickness: 0.8),
-                const SizedBox(height: 16),
+                const Divider(thickness: 0.7),
+                const SizedBox(height: 20),
 
-                /// ----- 루틴 전체 만족도 -----
+                /// 전체 만족도
                 const Text(
-                  "루틴 만족도",
+                  "루틴 전체 만족도",
                   style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 19,
+                    fontWeight: FontWeight.bold,
                     color: Color(0xFF006BE5),
                   ),
                 ),
-                const SizedBox(height: 16),
-                _StarRating(
-                  rating: _routineSatisfaction,
-                  onChanged: (value) {
-                    setState(() {
-                      _routineSatisfaction = value;
-                    });
-                  },
+
+                const SizedBox(height: 18),
+
+                Row(
+                  children: List.generate(5, (i) {
+                    final filled = i < _routineSatisfaction;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _routineSatisfaction = i + 1;
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: Icon(
+                          filled ? Icons.star : Icons.star_border,
+                          size: 32,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    );
+                  }),
                 ),
               ],
             ),
@@ -162,17 +191,17 @@ class _RoutineFeedbackPageState extends State<RoutineFeedbackPage> {
         ),
       ),
 
-      /// 하단 제출 버튼
       bottomNavigationBar: Container(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-        color: Colors.transparent,
         child: SizedBox(
           height: 60,
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () {
-              // 별점 값들은 _exerciseRatings, _routineSatisfaction 에 들어 있음
-              Get.to(RoutineSummaryPage());
+            onPressed: () async {
+              await submitRoutineRatings();
+              // TODO: 백엔드에서 소모된 칼로리 계산해주면 summary page로 라우팅 변경
+              routineController.clearRoutine();
+              Get.off(ChatPage());
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF2A66FF),
@@ -181,11 +210,11 @@ class _RoutineFeedbackPageState extends State<RoutineFeedbackPage> {
               ),
             ),
             child: const Text(
-              "제출하기",
+              "평가 제출",
               style: TextStyle(
                 fontSize: 18,
-                color: Colors.white,
                 fontWeight: FontWeight.w600,
+                color: Colors.white,
               ),
             ),
           ),
@@ -194,57 +223,48 @@ class _RoutineFeedbackPageState extends State<RoutineFeedbackPage> {
     );
   }
 
-  /// 운동 이름 칩 (연한 회색 배경 + 라운드)
-  Widget _exerciseChip(String name) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Text(
-        name,
-        style: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
-        ),
-      ),
+  Future<void> submitRoutineRatings() async {
+    final day = widget.dayNumber;
+    final todayExercises =
+        routineController.routines[day - 1].exercises;
+
+    final todayMappings = routineController.exerciseMappings
+        .where((m) => m.dayNumber == day)
+        .toList();
+
+    List<Map<String, dynamic>> exerciseRatingBody = [];
+
+    for (int i = 0; i < todayExercises.length; i++) {
+      final ex = todayExercises[i];
+
+      final mapping = todayMappings.firstWhere(
+            (m) => m.exerciseName == ex.name,
+        orElse: () => throw Exception("exercise mapping not found!"),
+      );
+
+      exerciseRatingBody.add({
+        "exercise_id": mapping.exerciseId,
+        "rating": ratings[i],
+      });
+    }
+
+    print("⭐ 최종 보내는 exercise_ratings:");
+    print(exerciseRatingBody);
+
+    // ⭐ 실제 만족도 값 채워서 API 호출
+    await submitRoutineRating(
+      workoutLogId: routineController.workoutLogId.value!,
+      routineSatisfaction: _routineSatisfaction,
+      exerciseRatings: exerciseRatingBody,
+      kcal: 0,
     );
+
+    Get.snackbar("완료", "평가가 저장되었습니다!");
   }
-}
 
-/// 공통 별점 위젯 (★ x 5)
-class _StarRating extends StatelessWidget {
-  final int rating; // 0~5
-  final ValueChanged<int> onChanged;
-
-  const _StarRating({
-    Key? key,
-    required this.rating,
-    required this.onChanged,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: List.generate(5, (index) {
-        final filled = index < rating;
-        return GestureDetector(
-          onTap: () {
-            onChanged(index + 1); // 1~5
-          },
-          child: Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: Icon(
-              filled ? Icons.star : Icons.star_border,
-              size: 32,
-              color: Colors.black87,
-            ),
-          ),
-        );
-      }),
-    );
+  String formatSeconds(int sec) {
+    final m = sec ~/ 60;
+    final s = sec % 60;
+    return "$m분 $s초";
   }
 }

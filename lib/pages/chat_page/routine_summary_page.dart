@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:haropal/components/appbar/app_bar_with_hamburger.dart';
 import 'package:haropal/components/hamburger/hamburger.dart';
-import 'package:haropal/pages/chat_page/routine_feedback_page.dart';
 
 import '../../controllers/routine_controller.dart';
 import 'chat_page.dart';
@@ -128,7 +127,7 @@ class RoutineSummaryPage extends StatelessWidget {
       ),
 
       /// -----------------------------
-      /// 2) 운동 종료 버튼
+      /// 2) 확인 버튼
       /// -----------------------------
       bottomNavigationBar: Container(
         padding: EdgeInsets.fromLTRB(16, 12, 16, 24),
@@ -162,7 +161,7 @@ class RoutineSummaryPage extends StatelessWidget {
   }
 
   /// -------------------------
-  /// 세트/반복/휴식 태그 UI 재사용 코드
+  /// 운동 목록 태그
   /// -------------------------
   Widget _infoTag(String label) {
     return Container(

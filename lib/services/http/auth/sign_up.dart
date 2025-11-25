@@ -10,7 +10,7 @@ Future<Map<String, dynamic>> signup({
   final body = {
     'email': email,
     'password': password,
-    if (name != null) 'name': name,
+    if (name != null) 'full_name': name,
   };
 
   final response = await dio.post(
