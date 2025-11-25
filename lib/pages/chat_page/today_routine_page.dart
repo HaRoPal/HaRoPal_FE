@@ -6,8 +6,12 @@ import 'package:haropal/pages/chat_page/routine_feedback_page.dart';
 
 import '../../controllers/routine_controller.dart';
 
+import 'package:stop_watch_timer/stop_watch_timer.dart';
+import '../../controllers/today_routine_controller.dart';
+
 class TodayRoutinePage extends StatelessWidget {
   final routineController = Get.find<RoutineController>();
+  final todayController = Get.put(TodayRoutineController());
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +56,27 @@ class TodayRoutinePage extends StatelessWidget {
                 ),
                 SizedBox(height: 12),
 
+                // 타이머 UI
+                StreamBuilder<int>(
+                  stream: todayController.timer.rawTime,
+                  initialData: 0,
+                  builder: (context, snap) {
+                    final value = snap.data ?? 0;
+                    final displayTime = StopWatchTimer.getDisplayTime(value);
+                    return Container(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Text(
+                        displayTime,
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF006BE5),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
                 /// 집중 분야
                 Text(
                   "집중 분야: ${today.focus}",
@@ -67,6 +92,7 @@ class TodayRoutinePage extends StatelessWidget {
                 /// 운동 리스트
                 ...today.exercises.map((ex) {
                   return Container(
+                    width: double.infinity,
                     margin: EdgeInsets.only(bottom: 16),
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -129,8 +155,19 @@ class TodayRoutinePage extends StatelessWidget {
           height: 60,
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: () {
-              Get.to(RoutineFeedbackPage());
+            onPressed: () async {
+              await todayController.finishRoutineAndSend();
+              final response = todayController.finalResponse.value;
+              if (response != null){
+                final index = routineController.routines.indexWhere((r) => r.day == today.day);
+                final dayNumber = index + 1;
+                routineController.todayDayNumber.value = dayNumber;
+                Get.to(RoutineFeedbackPage(dayNumber: dayNumber));
+              }
+              else{
+                Get.snackbar('오류', '운동을 종료하지 못했습니다');
+              }
+
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Color(0xFF2A66FF),

@@ -1,24 +1,40 @@
 import 'package:get/get.dart';
 
+import '../models/routine/exercise_mapping.dart';
 import '../models/routine/workout_routine.dart';
 
 class RoutineController extends GetxController {
   final routines = <WorkoutRoutine>[].obs;
-  bool get hasRoutine => routines.isNotEmpty;
+  final routineId = RxnInt();
+  final workoutLogId = RxnInt();
+  final todayDayNumber = RxnInt();
+  WorkoutRoutine? todayRoutine;
 
-  // today’s routine (Day 1 기준)
-  WorkoutRoutine? get todayRoutine {
-    if (routines.isEmpty) return null;
-    return routines.first;  // Day1만 가져오거나
-  }
+  // exercise_mappings 저장
+  final exerciseMappings = <ExerciseMapping>[].obs;
 
-  // 저장하는 함수
-  void saveRoutine(List<dynamic> jsonList) {
-    final parsed = jsonList.map((e) => WorkoutRoutine.fromJson(e)).toList();
-    routines.assignAll(parsed);
+  void saveRoutine({
+    required List<dynamic> routineJson,
+    required int id,
+    required List<dynamic> mappingJson,
+  }) {
+    routineId.value = id;
+
+    routines.assignAll(
+      routineJson.map((e) => WorkoutRoutine.fromJson(e)).toList(),
+    );
+
+    todayRoutine = routines.isNotEmpty ? routines[0] : null;
+
+    exerciseMappings.assignAll(
+      mappingJson.map((e) => ExerciseMapping.fromJson(e)).toList(),
+    );
   }
 
   void clearRoutine() {
+    routineId.value = null;
+    workoutLogId.value = null;
     routines.clear();
+    exerciseMappings.clear();
   }
 }

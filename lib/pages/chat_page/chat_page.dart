@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen_ai_chat_ui/flutter_gen_ai_chat_ui.dart';
 import 'package:get/get.dart';
 import 'package:haropal/pages/chat_page/today_routine_page.dart';
+import 'package:haropal/services/http/routine/start_routine.dart';
 
 import '../../components/appbar/app_bar_with_hamburger.dart';
 import '../../components/hamburger/hamburger.dart';
@@ -113,7 +114,24 @@ class _ChatPageState extends State<ChatPage> {
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  onPressed: () => Get.to(TodayRoutinePage()),
+                  onPressed: () async {
+                    final routineId = routineController.routineId.value;
+
+                    if (routineId != null) {
+                      final result = await startRoutine(routineId: routineId);
+                      Get.snackbar('startRoutine 결과', '${result}');
+                      if (result["success"] == true) {
+                        routineController.workoutLogId.value = result["workoutLogId"];
+                        Get.to(TodayRoutinePage());
+                      }
+                      else {
+                        Get.snackbar('오류', '루틴 시작에 실패했습니다');
+                      }
+
+                    }
+
+
+                  },
                   child: const Text(
                     "이 루틴으로 운동 시작",
                     style: TextStyle(fontSize: 16, color: Colors.white),
@@ -136,7 +154,7 @@ class _ChatPageState extends State<ChatPage> {
     isLoading.value = true;
 
     try {
-      // 최근 3개 유저 메시지
+      // 최근 5개 유저 메시지
       final userMessages = _controller.messages
           .where((msg) => msg.user.id == "user" && msg.text.trim().isNotEmpty)
           .toList();
@@ -159,7 +177,8 @@ class _ChatPageState extends State<ChatPage> {
       // CASE 1 — 루틴 생성
       // -------------------------------
       if (routineRaw is List) {
-        routineController.saveRoutine(routineRaw);
+        final routineId = response["routine_id"];
+        routineController.saveRoutine(routineJson: routineRaw, id:routineId, mappingJson: response["exercise_mappings"]);
         final today = routineController.routines.first;
 
         _addStaticAiMessage("오늘의 운동 루틴을 요약해드릴게요!");
