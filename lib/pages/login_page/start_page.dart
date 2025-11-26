@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:haropal/pages/login_page/sign_in_page.dart';
-import 'package:haropal/pages/login_page/sign_up_page.dart';
 
 import '../input_information_page/input_information_page.dart';
+import 'sign_in_page.dart';
+import 'sign_up_page.dart';
 
 class StartPage extends StatelessWidget {
   const StartPage({super.key});
