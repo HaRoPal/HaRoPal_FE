@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CheckList extends StatelessWidget {
   final String checkName;
@@ -22,7 +23,11 @@ class CheckList extends StatelessWidget {
           SizedBox(
             width: 100,
             child: TextField(
-              controller: checkController, //TODO: Connect Controller
+              controller: checkController,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly
+              ],
               textAlign: TextAlign.end,
               cursorColor: Colors.black,
               decoration: InputDecoration(

@@ -26,13 +26,14 @@ class _SplashPageState extends State<SplashPage> {
     final accessToken = await storage.read(key: 'access_token');
 
     // TODO: 토큰 만료 확인 필요
-    if (accessToken != null && accessToken.isNotEmpty) {
-      // 토큰 존재 → 자동 로그인
-      Get.offAll(() => InputInformationPage());
-    } else {
-      // 토큰 없음 → 로그인 페이지
-      Get.offAll(() => const StartPage());
-    }
+    // if (accessToken != null && accessToken.isNotEmpty) {
+    //   // 토큰 존재 → 자동 로그인
+    //   Get.offAll(() => ChatPage());
+    // } else {
+    //   // 토큰 없음 → 로그인 페이지
+    //   Get.offAll(() => const StartPage());
+    // }
+    Get.offAll(() => const StartPage());
   }
 
   @override
