@@ -123,14 +123,22 @@ class _CommunityPageState extends State<CommunityPage> {
                                   controller.totalRecommendedWorkout.length,
                                       (index) {
                                     final item = controller.totalRecommendedWorkout[index];
-                                    return ExerciseContainer(
-                                      nickname: item['nickname'],
-                                      category: item['category'],
-                                      kcal: item['kcal'],
-                                      satisfaction: item['satisfaction'],
-                                      height: item['height'],
-                                      weight: item['weight'],
-                                      totalTime: item['totalTime'],
+                                    return GestureDetector(
+                                      onTap: () {
+                                        final specificController = Get.find<SpecificPageController>();
+                                        specificController.logId.value = item['id'];
+                                        specificController.fetchSpecificWorkout();
+                                        Get.to(() => SpecificStatisticsPage());
+                                      },
+                                      child: ExerciseContainer(
+                                        nickname: item['nickname'],
+                                        category: item['category'],
+                                        kcal: item['kcal'],
+                                        satisfaction: item['satisfaction'],
+                                        height: item['height'],
+                                        weight: item['weight'],
+                                        totalTime: item['totalTime'],
+                                      ),
                                     );
                                   }
                               ),
