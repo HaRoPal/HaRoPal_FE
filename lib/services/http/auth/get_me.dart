@@ -8,7 +8,7 @@ Future<Map<String, dynamic>> getMe() async {
 
 
   final response = await dio.get(
-    'https://haropal-be.onrender.com/auth/signin',
+    'https://haropal-be.onrender.com/auth/me',
   );
 
   return response.data;

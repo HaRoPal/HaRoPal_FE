@@ -201,6 +201,7 @@ class _RoutineFeedbackPageState extends State<RoutineFeedbackPage> {
               await submitRoutineRatings();
               // TODO: 백엔드에서 소모된 칼로리 계산해주면 summary page로 라우팅 변경
               routineController.clearRoutine();
+              todayController.onClear();
               Get.off(ChatPage());
             },
             style: ElevatedButton.styleFrom(

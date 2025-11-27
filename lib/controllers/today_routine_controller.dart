@@ -59,4 +59,17 @@ class TodayRoutineController extends GetxController {
     await timer.dispose();
     super.onClose();
   }
+
+  void onClear() {
+    // 1) 타이머 초기화
+    timer.onStopTimer();
+    timer.onResetTimer();
+
+    // 2) rawTime 초기화
+    rawTime.value = 0;
+
+    // 3) 서버 응답값 초기화
+    finalResponse.value = null;
+
+  }
 }
