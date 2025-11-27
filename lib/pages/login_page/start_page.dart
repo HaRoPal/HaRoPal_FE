@@ -55,7 +55,7 @@ class StartPage extends StatelessWidget {
                         padding: EdgeInsetsGeometry.symmetric(vertical: 15)
                       ),
                       onPressed: () {
-                        controller.checkData();
+                        Get.to(SignInPage());
                       },
                       child: Text(
                           "로그인",
