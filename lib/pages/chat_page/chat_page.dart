@@ -119,7 +119,6 @@ class _ChatPageState extends State<ChatPage> {
 
                     if (routineId != null) {
                       final result = await startRoutine(routineId: routineId);
-                      Get.snackbar('startRoutine 결과', '${result}');
                       if (result["success"] == true) {
                         routineController.workoutLogId.value = result["workoutLogId"];
                         Get.to(TodayRoutinePage());

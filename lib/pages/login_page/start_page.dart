@@ -41,37 +41,45 @@ class StartPage extends StatelessWidget {
                 fontSize: 30,
               ),
             ),
-            Row(
+            Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Color(0xFF0070F0)
-                  ),
-                    onPressed: () {
-                      Get.to(SignUpPage());
-                    },
-                    child: Text(
-                        "회원 가입",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 30.0),
+                Container(
+                  padding: EdgeInsetsGeometry.symmetric(vertical: 5, horizontal: 20),
+                  width: double.infinity,
                   child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: Color(0xFF0070F0)
+                          backgroundColor: Color(0xFF0070F0),
+                        padding: EdgeInsetsGeometry.symmetric(vertical: 15)
                       ),
                       onPressed: () {
                         controller.checkData();
                       },
                       child: Text(
                           "로그인",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsetsGeometry.symmetric(vertical: 5, horizontal: 20),
+                  width: double.infinity,
+                  child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          padding: EdgeInsetsGeometry.symmetric(vertical: 15),
+                          foregroundColor: Colors.white,
+                          backgroundColor: Color(0xFF9D9D9D)
+                      ),
+                      onPressed: () {
+                        Get.to(SignUpPage());
+                      },
+                      child: Text(
+                        "회원 가입",
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
