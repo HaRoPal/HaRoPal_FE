@@ -7,7 +7,6 @@ import 'init_controllers.dart';
 import 'pages/login_page/start_page.dart';
 
 Future<void> main() async {
-  await dotenv.load(fileName: ".env");
   initControllers();
   runApp(const MyApp());
 }
