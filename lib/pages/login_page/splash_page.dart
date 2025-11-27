@@ -4,6 +4,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:haropal/pages/input_information_page/input_information_page.dart';
 import 'package:haropal/pages/login_page/start_page.dart';
 
+import '../chat_page/chat_page.dart';
+
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
@@ -25,15 +27,15 @@ class _SplashPageState extends State<SplashPage> {
 
     final accessToken = await storage.read(key: 'access_token');
 
-    // TODO: 토큰 만료 확인 필요
-    // if (accessToken != null && accessToken.isNotEmpty) {
-    //   // 토큰 존재 → 자동 로그인
-    //   Get.offAll(() => ChatPage());
-    // } else {
-    //   // 토큰 없음 → 로그인 페이지
-    //   Get.offAll(() => const StartPage());
-    // }
-    Get.offAll(() => const StartPage());
+
+    if (accessToken != null && accessToken.isNotEmpty) {
+      // 토큰 존재 → 자동 로그인
+      // TODO: 토큰 만료 로직 수정
+      Get.offAll(() => ChatPage());
+    } else {
+      // 토큰 없음 → 로그인 페이지
+      Get.offAll(() => const StartPage());
+    }
   }
 
   @override

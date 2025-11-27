@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:haropal/services/http/auth/sign_up.dart';
 
+import '../../services/http/auth/sign_in.dart';
+import '../input_information_page/input_information_page.dart';
+
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
@@ -90,9 +93,18 @@ class _SignUpPageState extends State<SignUpPage> {
                         );
                         if (result["success"]) {
                           Get.snackbar('성공', '회원가입에 성공하였습니다');
-                          Get.back();
+                          final signinResult = await signIn(
+                            email: email,
+                            password: password,
+                          );
+                          if (signinResult["success"] == true) {
+                            Get.snackbar('로그인 성공', '로그인에 성공하였습니다');
+                            Get.offAll(() => InputInformationPage());
+                          } else {
+                            Get.snackbar('오류', '로그인에 실패하였습니다');
+                          }
                         } else {
-                          Get.snackbar('오류', '회원가입에 실패하였습니다');
+                          Get.snackbar('오류', '회원가입에 실패하였습니다:${result["message"]}');
                         }
                       }
                     : null,
