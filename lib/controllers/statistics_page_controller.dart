@@ -2,17 +2,20 @@ import 'dart:math';
 
 import 'package:get/get.dart';
 
+import '../services/http/users/get_recent_stats.dart';
 import '../services/http/users/get_recent_workout.dart';
 
 class StatisticsPageController extends GetxController {
   RxBool isLoading = false.obs;
   RxInt totalCount = 0.obs;
   RxList<Map<String, dynamic>> myRecentWorkout = <Map<String, dynamic>>[].obs;
+  RxList statsList = [].obs;
 
   Future<void> fetchData() async {
     isLoading.value = true;
     try {
       await fetchMyRecentWorkout();
+      await fetchRecentStats();
     } catch (e) {
      print("StatisticsPageController Error: $e");
     } finally {
@@ -39,5 +42,10 @@ class StatisticsPageController extends GetxController {
       };
       myRecentWorkout.add(formData);
     }
+  }
+
+  Future<void> fetchRecentStats() async {
+    final rawData = await getRecentStats();
+    statsList.value = (rawData['items'] as List).reversed.toList();
   }
 }
