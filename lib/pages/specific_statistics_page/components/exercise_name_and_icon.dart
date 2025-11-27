@@ -22,6 +22,7 @@ class ExerciseNameAndIcon extends StatelessWidget {
               child: Image.asset(
                 iconPath,
                 width: 20,
+                errorBuilder: (_, __, ___) => SizedBox.shrink(),
               ),
             ),
           ],

@@ -30,7 +30,7 @@ class CommunityController extends GetxController {
       final id = rawData['workouts'][i]['log_id'];
       final category = rawData['workouts'][i]['routine']['category'];
       final kcal = rawData['workouts'][i]['kcal'];
-      final satisfaction = rawData['workouts'][i]['satisfaction'];
+      final satisfaction = rawData['workouts'][i]['satisfaction'] ?? 0;
       final height = rawData['workouts'][i]['user']['height'];
       final weight = rawData['workouts'][i]['user']['weight'];
       final totalTime = rawData['workouts'][i]['total_time'];
@@ -58,7 +58,7 @@ class CommunityController extends GetxController {
       final id = rawData['workouts'][i]['log_id'];
       final category = rawData['workouts'][i]['routine']['category'];
       final kcal = rawData['workouts'][i]['kcal'];
-      final satisfaction = rawData['workouts'][i]['satisfaction'];
+      final satisfaction = rawData['workouts'][i]['satisfaction'] ?? 0;
       final height = rawData['workouts'][i]['user']['height'];
       final weight = rawData['workouts'][i]['user']['weight'];
       final totalTime = rawData['workouts'][i]['total_time'];

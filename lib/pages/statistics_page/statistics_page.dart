@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:haropal/controllers/specific_page_controller.dart';
+import 'package:haropal/pages/specific_statistics_page/specific_statistics_page.dart';
 
 import '../../components/appbar/app_bar_with_title_and_hamburger.dart';
 import '../../components/hamburger/hamburger.dart';
@@ -22,10 +24,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
   void initState() {
     super.initState();
     controller.fetchData();
-    print(controller.totalCount.value);
-    // for (int i = 0; i < controller.totalCount.value; i++) {
-    //   print(controller.myRecentWorkout[i]['title']);
-    // }
   }
   @override
   Widget build(BuildContext context) {
@@ -89,11 +87,19 @@ class _StatisticsPageState extends State<StatisticsPage> {
                       child: Row(
                         children: [
                           for (int i = 0; i < controller.totalCount.value; i++)
-                          LatestExercise(
-                            title: controller.myRecentWorkout[i]['title'],
-                            workoutTime: controller.myRecentWorkout[i]['duration'],
-                            kcal: controller.myRecentWorkout[i]['kcal'],
-                            rating: controller.myRecentWorkout[i]['rating'],
+                          GestureDetector(
+                            onTap: () {
+                              final specificController = Get.find<SpecificPageController>();
+                              specificController.logId.value = controller.myRecentWorkout[i]['logId'];
+                              specificController.fetchSpecificWorkout();
+                              Get.to(() => SpecificStatisticsPage());
+                            },
+                            child: LatestExercise(
+                              title: controller.myRecentWorkout[i]['title'],
+                              workoutTime: controller.myRecentWorkout[i]['duration'],
+                              kcal: controller.myRecentWorkout[i]['kcal'],
+                              rating: controller.myRecentWorkout[i]['rating'],
+                            ),
                           ),
                         ],
                       ),
@@ -101,7 +107,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.all(10.0),
                   child: SizedBox(
                     width: double.infinity,
                     height: MediaQuery.of(context).size.width - 20,

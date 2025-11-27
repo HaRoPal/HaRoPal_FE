@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../input_information_page/input_information_page.dart';
+import '../../controllers/login_controller.dart';
 import 'sign_in_page.dart';
 import 'sign_up_page.dart';
 
@@ -11,6 +11,7 @@ class StartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final controller = Get.find<LoginController>();
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
@@ -67,7 +68,7 @@ class StartPage extends StatelessWidget {
                           backgroundColor: Color(0xFF0070F0)
                       ),
                       onPressed: () {
-                        Get.to(SignInPage());
+                        controller.checkData();
                       },
                       child: Text(
                           "로그인",
