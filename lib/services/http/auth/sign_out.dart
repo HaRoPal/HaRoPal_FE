@@ -12,5 +12,7 @@ Future<Map<String, dynamic>> signOut() async {
     'https://haropal-be.onrender.com/auth/signout',
   );
 
+  await storage.write(key: 'terms_agreed', value: 'false');
+
   return response.data;
 }

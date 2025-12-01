@@ -1,5 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../../../pages/login_page/terms_page.dart';
 import '../../dio/unauthorized_dio.dart';
+import 'package:get/get.dart';
 
 const storage = FlutterSecureStorage();
 
@@ -39,6 +41,18 @@ Future<Map<String, dynamic>> signIn({
       key: 'expires_at',
       value: session['expires_at'].toString(),
     );
+
+    // 약관 동의 여부 확인
+    final termsAgreed = await storage.read(key: 'terms_agreed') ?? 'false';
+
+    if (termsAgreed == 'false') {
+      // 약관 동의 페이지로 이동
+      final result = await Get.to(() => const TermsPage());
+
+      if (result == true) {
+        await storage.write(key: 'terms_agreed', value: 'true');
+      }
+    }
   }
 
   return data;
