@@ -76,7 +76,7 @@ class StartPage extends StatelessWidget {
                           backgroundColor: Color(0xFF9D9D9D)
                       ),
                       onPressed: () {
-                        Get.to(SignInPage());
+                        Get.to(SignUpPage());
                       },
                       child: Text(
                         "회원 가입",
