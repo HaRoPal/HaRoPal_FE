@@ -140,15 +140,7 @@ lib/
     flutter pub get
     ```
 
-3.  **환경 변수 설정**
-    루트 경로에 `.env` 파일 생성 후 내용 입력:
-
-    ```env
-    API_BASE_URL=...
-    OPENAI_API_KEY=...
-    ```
-
-4.  **앱 실행**
+3.  **앱 실행**
 
     ```bash
     flutter run
