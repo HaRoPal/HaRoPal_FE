@@ -181,13 +181,6 @@ Gymini 팀은 커뮤니티의 기여를 환영합니다\!
 
 -----
 
-## 📝 라이선스
-
-본 프로젝트는 MIT License를 따릅니다.
-자세한 내용은 `LICENSE` 파일을 참고하세요.
-
------
-
 <div align="center"\>
 Developed with ❤️ by the <strong\>Gymini Team</strong\>
 <div\>
